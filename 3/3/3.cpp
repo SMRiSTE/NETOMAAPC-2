@@ -20,6 +20,8 @@ public:
 
 void swap_w_l(Data& d1, Data& d2) {
     std::lock(d1.m, d2.m);
+    std::lock_guard(d1.m, std::adopt_lock);
+    std::lock_guard(d2.m, std::adopt_lock);
 
     int temp = d1.getData();
     d1.setData(d2.getData());
@@ -38,8 +40,9 @@ void swap_w_sl(Data& d1, Data& d2) {
 }
 
 void swap_w_ul(Data& d1, Data& d2) {
-    std::unique_lock<std::mutex> ul1(d1.m);    
-    std::unique_lock<std::mutex> ul2(d2.m);
+    std::unique_lock<std::mutex> ul1(d1.m, std::defer_lock);    
+    std::unique_lock<std::mutex> ul2(d2.m, std::defer_lock);
+    std::lock(ul1, ul2);
 
     int temp = d1.getData();
     d1.setData(d2.getData());
